@@ -7,9 +7,15 @@ import { PrismaError } from '../database/prisma-error.enum';
 @Injectable()
 export class NotesService {
   constructor(private readonly prismaService: PrismaService) {}
-  getAll(isFavourite?: boolean) {
+  getAll(isFavourite?: boolean, sortBy?: string, order?: 'asc' | 'desc') {
+    const orderBy: any = {};
+    if (sortBy) {
+      orderBy[sortBy] = order || 'asc';
+    }
+
     return this.prismaService.note.findMany({
       where: { isFavourite: isFavourite },
+      orderBy: sortBy ? orderBy : undefined,
     });
   }
 
@@ -69,5 +75,41 @@ export class NotesService {
       }
       throw error;
     }
+  }
+
+  async duplicate(id: number) {
+    const originalNote = await this.getById(id);
+    const { id: _, ...noteData } = originalNote;
+    return this.prismaService.note.create({
+      data: noteData,
+    });
+  }
+
+  async getStats() {
+    const [totalNotes, favouritedNotes, notesWithoutContent, allNotes] =
+      await Promise.all([
+        this.prismaService.note.count(),
+        this.prismaService.note.count({
+          where: { isFavourite: true },
+        }),
+        this.prismaService.note.count({
+          where: {
+            OR: [{ content: null }, { content: '' }],
+          },
+        }),
+        this.prismaService.note.findMany({
+          select: { title: true },
+        }),
+      ]);
+
+    const averageTitleLength =
+      allNotes.reduce((sum, note) => sum + note.title.length, 0) / totalNotes;
+
+    return {
+      totalNotes,
+      favouritedNotes,
+      notesWithoutContent,
+      averageTitleLength: Math.round(averageTitleLength * 100) / 100,
+    };
   }
 }

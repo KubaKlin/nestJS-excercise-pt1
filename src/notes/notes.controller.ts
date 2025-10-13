@@ -15,9 +15,20 @@ import type { NoteDto } from './note.dto';
 @Controller('notes')
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
+
   @Get()
-  getAll(@Query('isFavourite') isFavourite?: boolean) {
-    return this.notesService.getAll(isFavourite);
+  getAll(
+    @Query('isFavourite') isFavouriteParam?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('order') order?: 'asc' | 'desc',
+  ) {
+    // Convert string parameter to boolean
+    let isFavourite: boolean | undefined;
+    if (isFavouriteParam !== undefined) {
+      isFavourite = isFavouriteParam === 'true';
+    }
+
+    return this.notesService.getAll(isFavourite, sortBy, order);
   }
   @Post()
   create(@Body() note: NoteDto) {
@@ -37,5 +48,10 @@ export class NotesController {
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() note: NoteDto) {
     return this.notesService.update(id, note);
+  }
+
+  @Post(':id/duplicate')
+  duplicate(@Param('id', ParseIntPipe) id: number) {
+    return this.notesService.duplicate(id);
   }
 }
