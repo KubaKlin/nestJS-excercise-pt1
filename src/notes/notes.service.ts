@@ -8,14 +8,16 @@ import { PrismaError } from '../database/prisma-error.enum';
 export class NotesService {
   constructor(private readonly prismaService: PrismaService) {}
   getAll(isFavourite?: boolean, sortBy?: string, order?: 'asc' | 'desc') {
-    const orderBy: any = {};
+    let orderBy: Prisma.NoteOrderByWithRelationInput | undefined;
+    
     if (sortBy) {
-      orderBy[sortBy] = order || 'asc';
+      const sortOrder = order || 'asc';
+      orderBy = { [sortBy]: sortOrder } as Prisma.NoteOrderByWithRelationInput;
     }
 
     return this.prismaService.note.findMany({
       where: { isFavourite: isFavourite },
-      orderBy: sortBy ? orderBy : undefined,
+      orderBy,
     });
   }
 
