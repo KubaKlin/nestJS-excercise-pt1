@@ -9,7 +9,7 @@ export class NotesService {
   constructor(private readonly prismaService: PrismaService) {}
   getAll(isFavourite?: boolean, sortBy?: string, order?: 'asc' | 'desc') {
     let orderBy: Prisma.NoteOrderByWithRelationInput | undefined;
-    
+
     if (sortBy) {
       const sortOrder = order || 'asc';
       orderBy = { [sortBy]: sortOrder } as Prisma.NoteOrderByWithRelationInput;
