@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, Param, ParseIntPipe, Delete, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Param,
+  ParseIntPipe,
+  Delete,
+  Patch,
+} from '@nestjs/common';
 import { NotesService } from './notes.service';
 import type { NoteDto } from './note.dto';
 
