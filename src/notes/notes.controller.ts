@@ -9,6 +9,7 @@ import {
   ParseBoolPipe,
   Delete,
   Patch,
+  Put,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import type { NoteDto } from './note.dto';
@@ -39,6 +40,11 @@ export class NotesController {
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number) {
     await this.notesService.delete(id);
+  }
+
+  @Put(':id')
+  replace(@Param('id', ParseIntPipe) id: number, @Body() note: NoteDto) {
+    return this.notesService.replace(id, note);
   }
 
   @Patch(':id')

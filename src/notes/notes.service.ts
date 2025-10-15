@@ -84,6 +84,28 @@ export class NotesService {
     }
   }
 
+  async replace(id: number, note: NoteDto) {
+    try {
+      return await this.prismaService.note.update({
+        data: {
+          ...note,
+          id: undefined,
+        },
+        where: {
+          id,
+        },
+      });
+    } catch (error: unknown) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === PrismaError.RecordDoesNotExist
+      ) {
+        throw new NotFoundException();
+      }
+      throw error;
+    }
+  }
+
   async duplicate(id: number) {
     const originalNote = await this.getById(id);
     const { id: _, ...noteData } = originalNote;
