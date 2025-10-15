@@ -108,7 +108,7 @@ export class NotesService {
 
   async duplicate(id: number) {
     const originalNote = await this.getById(id);
-    const { id: _, ...noteData } = originalNote;
+    const { id: originalId, ...noteData } = originalNote;
     return this.prismaService.note.create({
       data: noteData,
     });
