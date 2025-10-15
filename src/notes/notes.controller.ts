@@ -6,6 +6,7 @@ import {
   Query,
   Param,
   ParseIntPipe,
+  ParseBoolPipe,
   Delete,
   Patch,
 } from '@nestjs/common';
@@ -18,16 +19,11 @@ export class NotesController {
 
   @Get()
   getAll(
-    @Query('isFavourite') isFavouriteParam?: string,
+    @Query('isFavourite', new ParseBoolPipe({ optional: true }))
+    isFavourite?: boolean,
     @Query('sortBy') sortBy?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
-    // Convert string parameter to boolean
-    let isFavourite: boolean | undefined;
-    if (isFavouriteParam !== undefined) {
-      isFavourite = isFavouriteParam === 'true';
-    }
-
     return this.notesService.getAll(isFavourite, sortBy, order);
   }
   @Post()
