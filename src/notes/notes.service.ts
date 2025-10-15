@@ -7,17 +7,22 @@ import { PrismaError } from '../database/prisma-error.enum';
 @Injectable()
 export class NotesService {
   constructor(private readonly prismaService: PrismaService) {}
-  getAll(isFavourite?: boolean, sortBy?: string, order?: 'asc' | 'desc') {
-    let orderBy: Prisma.NoteOrderByWithRelationInput | undefined;
 
-    if (sortBy) {
-      const sortOrder = order || 'asc';
-      orderBy = { [sortBy]: sortOrder } as Prisma.NoteOrderByWithRelationInput;
+  private buildOrderBy(
+    sortBy?: string,
+    order?: 'asc' | 'desc',
+  ): Prisma.NoteOrderByWithRelationInput | undefined {
+    if (!sortBy) {
+      return undefined;
     }
+    const sortOrder = order || 'asc';
+    return { [sortBy]: sortOrder } as Prisma.NoteOrderByWithRelationInput;
+  }
 
+  getAll(isFavourite?: boolean, sortBy?: string, order?: 'asc' | 'desc') {
     return this.prismaService.note.findMany({
       where: { isFavourite: isFavourite },
-      orderBy,
+      orderBy: this.buildOrderBy(sortBy, order),
     });
   }
 
