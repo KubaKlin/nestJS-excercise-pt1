@@ -115,7 +115,7 @@ export class NotesService {
   }
 
   async getStats() {
-    const [totalNotes, favouritedNotes, notesWithoutContent, allNotes] =
+    const [totalNotes, favouritedNotes, notesWithoutContent, averageResult] =
       await Promise.all([
         this.prismaService.note.count(),
         this.prismaService.note.count({
@@ -126,13 +126,12 @@ export class NotesService {
             OR: [{ content: null }, { content: '' }],
           },
         }),
-        this.prismaService.note.findMany({
-          select: { title: true },
-        }),
+        this.prismaService.$queryRaw<[{ averageTitleLength: number }]>`
+          SELECT AVG(LENGTH(title)) as averageTitleLength FROM Note
+        `,
       ]);
 
-    const averageTitleLength =
-      allNotes.reduce((sum, note) => sum + note.title.length, 0) / totalNotes;
+    const averageTitleLength = averageResult[0]?.averageTitleLength || 0;
 
     return {
       totalNotes,
