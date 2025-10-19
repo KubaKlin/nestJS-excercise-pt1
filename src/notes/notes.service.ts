@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
-import { NoteDto } from './note.dto';
+import { NoteDto, PartialNoteDto } from './note.dto';
 import { Prisma } from '../../generated/prisma';
 import { PrismaError } from '../database/prisma-error.enum';
 
@@ -62,11 +62,17 @@ export class NotesService {
     }
   }
 
-  async update(id: number, note: NoteDto) {
+  async update(id: number, partialNote: PartialNoteDto) {
     try {
+      const updateData = Object.fromEntries(
+        Object.entries(partialNote).filter(
+          ([key, value]) => value !== undefined,
+        ),
+      );
+
       return await this.prismaService.note.update({
         data: {
-          ...note,
+          ...updateData,
           id: undefined,
         },
         where: {
@@ -88,8 +94,10 @@ export class NotesService {
     try {
       return await this.prismaService.note.update({
         data: {
-          ...note,
-          id: undefined,
+          title: note.title,
+          content: note.content ?? null,
+          isFavourite: note.isFavourite,
+          priority: note.priority,
         },
         where: {
           id,

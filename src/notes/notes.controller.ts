@@ -12,7 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
-import type { NoteDto } from './note.dto';
+import type { NoteDto, PartialNoteDto } from './note.dto';
 
 @Controller('notes')
 export class NotesController {
@@ -48,8 +48,11 @@ export class NotesController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() note: NoteDto) {
-    return this.notesService.update(id, note);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() partialNote: PartialNoteDto,
+  ) {
+    return this.notesService.update(id, partialNote);
   }
 
   @Post(':id/duplicate')
