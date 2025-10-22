@@ -64,17 +64,8 @@ export class NotesService {
 
   async update(id: number, partialNote: PartialNoteDto) {
     try {
-      const updateData = Object.fromEntries(
-        Object.entries(partialNote).filter(
-          ([key, value]) => value !== undefined,
-        ),
-      );
-
       return await this.prismaService.note.update({
-        data: {
-          ...updateData,
-          id: undefined,
-        },
+        data: partialNote,
         where: {
           id,
         },
